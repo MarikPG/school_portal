@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{% if object %}Редагувати подію{% else %}Додати нову подію{% endif %}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Зберегти</button>
+    <a href="{% url 'events_and_calendar:event_list' %}">Скасувати</a>
+</form>
+{% endblock %}
