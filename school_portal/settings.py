@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q_751a#xzg%o4l0y-^j0%744)9p(kbn*v8_gtv=w4hi%@tvf41
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '[::1]']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'surveyapp'
 ]
 
 MIDDLEWARE = [
