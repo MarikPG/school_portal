@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ question.question_text }}</h2>
+
+    {% if error_message %}
+        <div class="alert alert-danger mt-2">{{ error_message }}</div>
+    {% endif %}
+
+    <form action="{% url 'polls:vote' question.id %}" method="post" class="mt-3">
+        {% csrf_token %}
+        {% for choice in question.choices.all %}
+            <div class="form-check my-2">
+                <input class="form-check-input" type="radio" name="choice" id="choice{{ choice.id }}" value="{{ choice.id }}">
+                <label class="form-check-label" for="choice{{ choice.id }}">
+                    {{ choice.choice_text }}
+                </label>
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary mt-3">Проголосувати</button>
+        <a href="{% url 'polls:results' question.id %}" class="btn btn-link mt-3">Переглянути результати</a>
+    </form>
+</div>
+{% endblock %}
