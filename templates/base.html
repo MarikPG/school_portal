@@ -6,9 +6,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Навбар -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">School Portal</a>
+            <a class="navbar-brand" href="/">School Portal</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Вхід</a></li>
@@ -18,6 +19,8 @@
             </div>
         </div>
     </nav>
+
+    <!-- Контент -->
     <main>
         {% block content %}{% endblock %}
     </main>
