@@ -8,12 +8,14 @@
 
     <div>
         {% for event in events %}
-            <article style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
-                <h2>{{ event.title }}</h2>
-                <p>
-                    <strong>Час:</strong> {{ event.start_time|date:"d.m.Y H:i" }}
+            <article style="margin-bottom: 24px;">
+                <h2 style="margin-bottom: 6px;">
+                    <a href="{% url 'events_and_calendar:event_detail' event.pk %}">{{ event.title }}</a>
+                </h2>
+                <p style="margin-bottom: 8px; color: #555;">
+                    <span>Час: {{ event.start_time|date:"d.m.Y H:i" }}</span>
                     {% if event.location %}
-                        | <strong>Місце:</strong> {{ event.location }}
+                        <span> | Місце: {{ event.location }}</span>
                     {% endif %}
                 </p>
                 {% if event.description %}
