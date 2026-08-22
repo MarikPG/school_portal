@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Події та Календар{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Події та Календар</h1>
+
+    <div>
+        {% for event in events %}
+            <article style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+                <h2>{{ event.title }}</h2>
+                <p>
+                    <strong>Час:</strong> {{ event.start_time|date:"d.m.Y H:i" }}
+                    {% if event.location %}
+                        | <strong>Місце:</strong> {{ event.location }}
+                    {% endif %}
+                </p>
+                {% if event.description %}
+                    <p>{{ event.description }}</p>
+                {% endif %}
+            </article>
+        {% empty %}
+            <p>Подій поки немає.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
