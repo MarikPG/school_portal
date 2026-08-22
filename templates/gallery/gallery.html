@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Галерея{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Галерея</h1>
+        <p class="text-muted mb-0">
+            Фото та відео проєкту
+        </p>
+    </div>
+
+    <a href="{% url 'gallery:upload' %}" class="btn btn-primary">
+        Додати файл
+    </a>
+</div>
+
+
+<div class="row g-4">
+
+    {% for item in media_items %}
+
+        <div class="col-12 col-sm-6 col-lg-4">
+
+            <div class="card h-100 shadow-sm">
+
+                {% if item.media_type == "image" %}
+
+                    <img
+                        src="{{ item.file.url }}"
+                        class="card-img-top"
+                        alt="{{ item.title }}"
+                        style="height: 250px; object-fit: cover;"
+                    >
+
+                {% elif item.media_type == "video" %}
+
+                    <video
+                        class="card-img-top"
+                        controls
+                        preload="metadata"
+                        style="height: 250px; object-fit: cover;"
+                    >
+                        <source src="{{ item.file.url }}">
+                        Ваш браузер не підтримує відтворення відео.
+                    </video>
+
+                {% endif %}
+
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        {{ item.title }}
+                    </h5>
+
+                    {% if item.description %}
+                        <p class="card-text">
+                            {{ item.description }}
+                        </p>
+                    {% endif %}
+
+                </div>
+
+                <div class="card-footer text-muted">
+                    {{ item.created_at|date:"d.m.Y H:i" }}
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="col-12">
+            <div class="alert alert-info">
+                Галерея поки що порожня.
+            </div>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

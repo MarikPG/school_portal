@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Додати файл{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-12 col-lg-7">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body p-4">
+
+                <h1 class="mb-4">
+                    Додати фото або відео
+                </h1>
+
+                <form method="post" enctype="multipart/form-data">
+
+                    {% csrf_token %}
+
+                    {{ form.non_field_errors }}
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Назва
+                        </label>
+
+                        {{ form.title }}
+
+                        {{ form.title.errors }}
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Опис
+                        </label>
+
+                        {{ form.description }}
+
+                        {{ form.description.errors }}
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Файл
+                        </label>
+
+                        {{ form.file }}
+
+                        {{ form.file.errors }}
+
+                        <div class="form-text">
+                            Фото: JPG, JPEG, PNG, GIF, WEBP.
+                            Відео: MP4, WEBM, OGG, MOV.
+                        </div>
+                    </div>
+
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Тип файлу
+                        </label>
+
+                        {{ form.media_type }}
+
+                        {{ form.media_type.errors }}
+                    </div>
+
+
+                    <div class="d-flex gap-2">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Завантажити
+                        </button>
+
+                        <a
+                            href="{% url 'gallery:gallery' %}"
+                            class="btn btn-secondary"
+                        >
+                            Назад
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
