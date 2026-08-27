@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Event
 
 class EventListView(ListView):
@@ -47,6 +48,16 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             attrs={'type': 'datetime-local'}
         )
         return form
+
+    def test_func(self):
+        event = self.get_object()
+        user = self.request.user
+        return user == event.author or user.is_staff or user.is_superuser
+    
+class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Event
+    template_name = 'events_and_calendar/event_confirm_delete.html'
+    success_url = reverse_lazy('events_and_calendar:event_list')
 
     def test_func(self):
         event = self.get_object()
