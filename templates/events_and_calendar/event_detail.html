@@ -6,7 +6,7 @@
 <div>
     <h1>{{ event.title }}</h1>
 
-    <div style="margin-bottom: 20px; color: #444;">
+    <div>
         <p><strong>Початок:</strong> {{ event.start_time|date:"d.m.Y H:i" }}</p>
         {% if event.end_time %}
             <p><strong>Завершення:</strong> {{ event.end_time|date:"d.m.Y H:i" }}</p>
@@ -14,13 +14,22 @@
         {% if event.location %}
             <p><strong>Місце проведення:</strong> {{ event.location }}</p>
         {% endif %}
+        {% if event.author %}
+            <p><strong>Автор:</strong> {{ event.author.username }}</p>
+        {% endif %}
     </div>
 
     {% if event.description %}
-        <div style="margin-bottom: 24px;">
+        <div>
             <h3>Опис</h3>
             <p>{{ event.description }}</p>
         </div>
+    {% endif %}
+
+    {% if user == event.author or user.is_staff or user.is_superuser %}
+        <p>
+            <a href="{% url 'events_and_calendar:event_update' event.pk %}">Редагувати подію</a>
+        </p>
     {% endif %}
 
     <div>
