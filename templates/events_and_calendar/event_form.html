@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Створити подію{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Створення події</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Зберегти</button>
+    </form>
+
+    <p>
+        <a href="{% url 'events_and_calendar:event_list' %}">Скасувати</a>
+    </p>
+</div>
+{% endblock %}
