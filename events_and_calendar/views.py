@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import Event
 
 class EventListView(ListView):
@@ -53,7 +54,7 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         event = self.get_object()
         user = self.request.user
         return user == event.author or user.is_staff or user.is_superuser
-    
+
 class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Event
     template_name = 'events_and_calendar/event_confirm_delete.html'
@@ -63,3 +64,18 @@ class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         event = self.get_object()
         user = self.request.user
         return user == event.author or user.is_staff or user.is_superuser
+
+class CalendarView(TemplateView):
+    template_name = 'events_and_calendar/calendar.html'
+
+def event_calendar_json(request):
+    events = Event.objects.all()
+    event_list = []
+    for event in events:
+        event_list.append({
+            'title': event.title,
+            'start': event.start_time.isoformat(),
+            'end': event.end_time.isoformat() if event.end_time else None,
+            'url': f'/events/{event.pk}/',
+        })
+    return JsonResponse(event_list, safe=False)
