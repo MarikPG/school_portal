@@ -22,9 +22,8 @@ class Question(models.Model):
     QUESTION_TYPE_TEXT = 'text'
 
     QUESTION_TYPES = [
-        (QUESTION_TYPE_SINGLE, 'Один варіант'),
         (QUESTION_TYPE_MULTI, 'Кілька варіантів'),
-        (QUESTION_TYPE_TEXT, 'Текстовий відповідь'),
+        (QUESTION_TYPE_TEXT, 'Текстова відповідь'),
     ]
 
     survey = models.ForeignKey(Survey, related_name='questions', on_delete=models.CASCADE)
@@ -61,7 +60,13 @@ class ChoiceOption(models.Model):
 
 class SurveyResponse(models.Model):
     survey = models.ForeignKey(Survey, related_name='responses', on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='survey_responses', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='survey_responses',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -81,7 +86,10 @@ class Answer(models.Model):
     class Meta:
         ordering = ['response', 'question']
         constraints = [
-            models.UniqueConstraint(fields=['response', 'question'], name='unique_answer_per_question_in_response')
+            models.UniqueConstraint(
+                fields=['response', 'question', 'choice'],
+                name='unique_choice_per_question_in_response',
+            )
         ]
 
     def __str__(self):

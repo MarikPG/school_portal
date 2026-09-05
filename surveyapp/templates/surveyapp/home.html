@@ -38,9 +38,28 @@
                 </div>
             </div>
 
-            <div class="d-grid gap-2 d-sm-flex justify-content-center">
-                <button type="button" class="btn btn-primary btn-lg px-4">Розпочати опитування</button>
-                <button type="button" class="btn btn-outline-secondary btn-lg px-4">Подивитись результати</button>
+            <div class="d-grid gap-2 d-sm-flex justify-content-center mt-5">
+                <a href="{% url 'create_survey' %}" class="btn btn-outline-secondary btn-lg px-4">Створити опитування</a>
+            </div>
+
+            <hr class="my-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 mb-0">Доступні опитування</h2>
+                <span class="text-secondary">{{ surveys|length }}</span>
+            </div>
+            <div class="row g-3 text-start">
+                {% for survey in surveys %}
+                    <div class="col-md-6">
+                        <div class="border rounded-4 p-4 h-100 d-flex flex-column">
+                            <h3 class="h5 fw-semibold">{{ survey.title }}</h3>
+                            {% if survey.description %}<p class="text-secondary flex-grow-1">{{ survey.description }}</p>{% endif %}
+                            <p class="small text-secondary">Питань: {{ survey.questions.count }}</p>
+                            <a href="{% url 'take_survey' survey.id %}" class="btn btn-primary">Розпочати це опитування</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12"><p class="text-secondary mb-0">Поки немає активних опитувань.</p></div>
+                {% endfor %}
             </div>
         </div>
     </div>
