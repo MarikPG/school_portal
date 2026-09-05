@@ -4,83 +4,1129 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="mb-1">Галерея</h1>
-        <p class="text-muted mb-0">
-            Фото та відео проєкту
-        </p>
+<style>
+    /* =========================================================
+       GALLERY THEME SYSTEM
+       ========================================================= */
+
+    html, body {
+        margin: 0;
+        min-height: 100%;
+    }
+
+    body {
+        background: #0a0d12 !important;
+        transition: background .35s ease;
+    }
+
+    body.gallery-light-theme {
+        background: #f4f6fa !important;
+    }
+
+    .gallery-page {
+        width: 100vw;
+        max-width: none;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+
+        --g-bg: #0a0d12;
+        --g-bg-secondary: #10141b;
+        --g-card: rgba(18, 23, 31, 0.92);
+        --g-card-hover: rgba(24, 30, 40, 0.98);
+        --g-text: #f3f5f8;
+        --g-text-secondary: #8f98a8;
+        --g-border: rgba(255,255,255,.08);
+        --g-border-hover: rgba(112,126,255,.35);
+        --g-primary: #6d7cff;
+        --g-primary-hover: #7e8bff;
+        --g-danger: #ef5968;
+        --g-danger-hover: #ff6978;
+        --g-shadow: rgba(0,0,0,.28);
+
+        min-height: 100vh;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 30px 20px 60px;
+
+        color: var(--g-text);
+
+        background:
+            radial-gradient(
+                circle at 5% 0%,
+                rgba(109,124,255,.12),
+                transparent 28%
+            ),
+            radial-gradient(
+                circle at 95% 5%,
+                rgba(130,90,255,.08),
+                transparent 25%
+            ),
+            var(--g-bg);
+
+        transition:
+            background .35s ease,
+            color .35s ease;
+    }
+
+
+    /* =========================================================
+       LIGHT THEME
+       ========================================================= */
+
+    .gallery-page.light-theme {
+        --g-bg: #f4f6fa;
+        --g-bg-secondary: #ffffff;
+        --g-card: rgba(255,255,255,.94);
+        --g-card-hover: #ffffff;
+        --g-text: #171b24;
+        --g-text-secondary: #6e7787;
+        --g-border: rgba(20,25,35,.09);
+        --g-border-hover: rgba(89,103,230,.35);
+        --g-primary: #5969e9;
+        --g-primary-hover: #6878f4;
+        --g-danger: #df4d5d;
+        --g-danger-hover: #ec5c6b;
+        --g-shadow: rgba(20,28,45,.10);
+
+        background:
+            radial-gradient(
+                circle at 5% 0%,
+                rgba(89,105,233,.11),
+                transparent 28%
+            ),
+            radial-gradient(
+                circle at 95% 5%,
+                rgba(125,90,230,.08),
+                transparent 25%
+            ),
+            var(--g-bg);
+    }
+
+
+    /* =========================================================
+       PAGE TRANSITION
+       ========================================================= */
+
+    .gallery-transition {
+        opacity: 1;
+        transform: translateY(0);
+
+        transition:
+            opacity .25s ease,
+            transform .25s ease;
+    }
+
+    .gallery-transition.leaving {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+
+    /* =========================================================
+       MAIN WRAPPER
+       ========================================================= */
+
+    .gallery-inner {
+        width: min(1450px, 100%);
+        margin: 0 auto;
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .gallery-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        margin-bottom: 30px;
+    }
+
+    .gallery-title h1 {
+        margin: 0;
+
+        color: var(--g-text);
+
+        font-size: clamp(30px, 4vw, 44px);
+        font-weight: 850;
+        line-height: 1.05;
+        letter-spacing: -1px;
+
+        transition: color .3s ease;
+    }
+
+    .gallery-title p {
+        margin: 9px 0 0;
+
+        color: var(--g-text-secondary);
+
+        font-size: 14px;
+
+        transition: color .3s ease;
+    }
+
+
+    /* =========================================================
+       RIGHT SIDE HEADER
+       ========================================================= */
+
+    .gallery-header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+
+    /* =========================================================
+       THEME BUTTONS
+       ========================================================= */
+
+    .theme-switcher {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        padding: 5px;
+
+        background: var(--g-card);
+
+        border: 1px solid var(--g-border);
+        border-radius: 13px;
+
+        box-shadow: 0 10px 30px var(--g-shadow);
+
+        transition:
+            background .3s ease,
+            border-color .3s ease,
+            box-shadow .3s ease;
+    }
+
+    .theme-btn {
+        width: 38px;
+        height: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0;
+
+        border: 0;
+        border-radius: 9px;
+
+        color: var(--g-text-secondary);
+        background: transparent;
+
+        font-size: 17px;
+
+        cursor: pointer;
+
+        transition:
+            background .2s ease,
+            color .2s ease,
+            transform .15s ease;
+    }
+
+    .theme-btn:hover {
+        color: var(--g-text);
+        background: rgba(127,127,127,.10);
+
+        transform: translateY(-1px);
+    }
+
+    .theme-btn:active {
+        transform: scale(.91);
+    }
+
+    .theme-btn.active {
+        color: var(--g-text);
+        background: rgba(109,124,255,.17);
+    }
+
+
+    /* =========================================================
+       ADD BUTTON
+       ========================================================= */
+
+    .gallery-add-btn {
+        position: relative;
+        overflow: hidden;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        min-height: 44px;
+        padding: 0 18px;
+
+        border: 0;
+        border-radius: 11px;
+
+        color: white !important;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--g-primary),
+                #805cff
+            );
+
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 750;
+
+        box-shadow:
+            0 10px 25px rgba(109,124,255,.22);
+
+        cursor: pointer;
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            filter .2s ease;
+    }
+
+    .gallery-add-btn::after {
+        content: "";
+
+        position: absolute;
+
+        width: 45px;
+        height: 150px;
+
+        left: -70px;
+        top: -50px;
+
+        background: rgba(255,255,255,.20);
+
+        transform: rotate(25deg);
+
+        transition: left .45s ease;
+    }
+
+    .gallery-add-btn:hover {
+        transform: translateY(-3px);
+
+        box-shadow:
+            0 15px 32px rgba(109,124,255,.32);
+
+        filter: brightness(1.06);
+    }
+
+    .gallery-add-btn:hover::after {
+        left: 125%;
+    }
+
+    .gallery-add-btn:active {
+        transform: scale(.96);
+    }
+
+
+    /* =========================================================
+       GRID
+       ========================================================= */
+
+    .gallery-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+
+        gap: 21px;
+    }
+
+
+    /* =========================================================
+       CARD
+       ========================================================= */
+
+    .gallery-card {
+        overflow: hidden;
+
+        background: var(--g-card);
+
+        border: 1px solid var(--g-border);
+        border-radius: 18px;
+
+        box-shadow:
+            0 16px 42px var(--g-shadow);
+
+        opacity: 0;
+
+        animation:
+            galleryCardIn .45s ease forwards;
+
+        transition:
+            background .3s ease,
+            border-color .25s ease,
+            box-shadow .25s ease,
+            transform .25s ease;
+    }
+
+    .gallery-card:nth-child(1) { animation-delay: .03s; }
+    .gallery-card:nth-child(2) { animation-delay: .06s; }
+    .gallery-card:nth-child(3) { animation-delay: .09s; }
+    .gallery-card:nth-child(4) { animation-delay: .12s; }
+    .gallery-card:nth-child(5) { animation-delay: .15s; }
+    .gallery-card:nth-child(6) { animation-delay: .18s; }
+    .gallery-card:nth-child(7) { animation-delay: .21s; }
+    .gallery-card:nth-child(8) { animation-delay: .24s; }
+
+    @keyframes galleryCardIn {
+        from {
+            opacity: 0;
+            transform: translateY(16px) scale(.985);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .gallery-card:hover {
+        transform: translateY(-7px);
+
+        background: var(--g-card-hover);
+
+        border-color: var(--g-border-hover);
+
+        box-shadow:
+            0 25px 55px var(--g-shadow);
+    }
+
+
+    /* =========================================================
+       PREVIEW
+       ========================================================= */
+
+    .gallery-preview {
+        position: relative;
+
+        width: 100%;
+        height: 240px;
+
+        overflow: hidden;
+
+        background: #090c11;
+    }
+
+    .gallery-preview img,
+    .gallery-preview video {
+        display: block;
+
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+    }
+
+    .gallery-preview img {
+        transition:
+            transform .45s cubic-bezier(.2,.7,.2,1),
+            filter .35s ease;
+    }
+
+    .gallery-card:hover .gallery-preview img {
+        transform: scale(1.065);
+        filter: brightness(1.05);
+    }
+
+    .gallery-preview::after {
+        content: "";
+
+        position: absolute;
+        inset: 0;
+
+        background:
+            linear-gradient(
+                to bottom,
+                rgba(0,0,0,.22),
+                transparent 35%,
+                rgba(0,0,0,.18)
+            );
+
+        pointer-events: none;
+    }
+
+
+    /* =========================================================
+       TYPE BADGE
+       ========================================================= */
+
+    .gallery-type {
+        position: absolute;
+        z-index: 2;
+
+        top: 12px;
+        left: 12px;
+
+        padding: 7px 9px;
+
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 8px;
+
+        color: white;
+
+        background: rgba(7,10,14,.72);
+
+        backdrop-filter: blur(10px);
+
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+
+    /* =========================================================
+       BODY
+       ========================================================= */
+
+    .gallery-card-body {
+        padding: 17px 18px 15px;
+    }
+
+    .gallery-card-name {
+        margin: 0;
+
+        color: var(--g-text);
+
+        font-size: 17px;
+        font-weight: 750;
+        line-height: 1.3;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        transition: color .3s ease;
+    }
+
+    .gallery-description {
+        min-height: 40px;
+
+        margin: 8px 0 0;
+
+        color: var(--g-text-secondary);
+
+        font-size: 12.5px;
+        line-height: 1.55;
+
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+
+        transition: color .3s ease;
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .gallery-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 10px;
+
+        padding: 13px 18px;
+
+        border-top: 1px solid var(--g-border);
+
+        transition: border-color .3s ease;
+    }
+
+    .gallery-date {
+        color: var(--g-text-secondary);
+
+        font-size: 10.5px;
+
+        white-space: nowrap;
+
+        transition: color .3s ease;
+    }
+
+    .gallery-actions {
+        display: flex;
+        gap: 7px;
+    }
+
+
+    /* =========================================================
+       ACTION BUTTONS
+       ========================================================= */
+
+    .gallery-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        min-height: 33px;
+        padding: 0 10px;
+
+        border-radius: 8px;
+
+        text-decoration: none;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        transition:
+            transform .16s ease,
+            background .18s ease,
+            color .18s ease,
+            border-color .18s ease;
+    }
+
+    .gallery-action:active {
+        transform: scale(.93);
+    }
+
+    .gallery-edit {
+        color: #aeb8ff;
+
+        background: rgba(101,117,255,.10);
+
+        border: 1px solid rgba(101,117,255,.16);
+    }
+
+    .gallery-edit:hover {
+        color: #fff;
+
+        background: rgba(101,117,255,.24);
+
+        transform: translateY(-2px);
+    }
+
+    .gallery-delete {
+        color: #ff9da8;
+
+        background: rgba(239,89,104,.08);
+
+        border: 1px solid rgba(239,89,104,.14);
+    }
+
+    .gallery-delete:hover {
+        color: #fff;
+
+        background: rgba(239,89,104,.22);
+
+        transform: translateY(-2px);
+    }
+
+
+    /* =========================================================
+       MESSAGES
+       ========================================================= */
+
+    .gallery-message {
+        margin-bottom: 20px;
+        padding: 13px 15px;
+
+        border-radius: 10px;
+
+        color: #8fe2b1;
+
+        background: rgba(66,190,126,.08);
+
+        border: 1px solid rgba(66,190,126,.16);
+
+        animation:
+            galleryFadeIn .35s ease;
+    }
+
+    @keyframes galleryFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    .gallery-empty {
+        padding: 75px 25px;
+
+        text-align: center;
+
+        background: var(--g-card);
+
+        border: 1px dashed var(--g-border);
+        border-radius: 18px;
+
+        box-shadow: 0 16px 42px var(--g-shadow);
+
+        transition:
+            background .3s ease,
+            border-color .3s ease;
+    }
+
+    .gallery-empty h2 {
+        margin: 0 0 8px;
+
+        color: var(--g-text);
+
+        font-size: 22px;
+    }
+
+    .gallery-empty p {
+        margin: 0 0 22px;
+
+        color: var(--g-text-secondary);
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1200px) {
+        .gallery-grid {
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 900px) {
+        .gallery-grid {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 650px) {
+
+        .gallery-page {
+            padding: 23px 13px 45px;
+        }
+
+        .gallery-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .gallery-header-right {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .gallery-add-btn {
+            flex: 1;
+        }
+
+        .gallery-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .gallery-preview {
+            height: 230px;
+        }
+
+        .gallery-footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .gallery-actions {
+            width: 100%;
+        }
+
+        .gallery-action {
+            flex: 1;
+        }
+    }
+</style>
+
+
+<div
+    id="galleryPage"
+    class="gallery-page gallery-transition"
+>
+
+    <div class="gallery-inner">
+
+        <!-- =====================================================
+             HEADER
+             ===================================================== -->
+
+        <div class="gallery-header">
+
+            <div class="gallery-title">
+
+                <h1>
+                    Галерея
+                </h1>
+
+                <p>
+                    Твої фото та відео в одному місці
+                </p>
+
+            </div>
+
+
+            <div class="gallery-header-right">
+
+                <!-- THEME -->
+                <div class="theme-switcher">
+
+                    <button
+                        type="button"
+                        id="darkThemeBtn"
+                        class="theme-btn"
+                        title="Темна тема"
+                    >
+                        ☾
+                    </button>
+
+                    <button
+                        type="button"
+                        id="lightThemeBtn"
+                        class="theme-btn"
+                        title="Світла тема"
+                    >
+                        ☀
+                    </button>
+
+                </div>
+
+
+                <!-- ADD -->
+                <a
+                    href="{% url 'gallery:upload' %}"
+                    class="gallery-add-btn"
+                    data-page-link
+                >
+                    <span style="font-size: 18px;">
+                        +
+                    </span>
+
+                    Додати файл
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             MESSAGES
+             ===================================================== -->
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="gallery-message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <!-- =====================================================
+             CONTENT
+             ===================================================== -->
+
+        {% if media_items %}
+
+            <div class="gallery-grid">
+
+                {% for item in media_items %}
+
+                    <article class="gallery-card">
+
+                        <!-- PREVIEW -->
+                        <div class="gallery-preview">
+
+                            {% if item.media_type == "image" %}
+
+                                <img
+                                    src="{{ item.file.url }}"
+                                    alt="{{ item.title }}"
+                                    loading="lazy"
+                                >
+
+                                <span class="gallery-type">
+                                    PHOTO
+                                </span>
+
+                            {% elif item.media_type == "video" %}
+
+                                <video
+                                    controls
+                                    preload="metadata"
+                                >
+
+                                    <source src="{{ item.file.url }}">
+
+                                    Ваш браузер не підтримує
+                                    відтворення відео.
+
+                                </video>
+
+                                <span class="gallery-type">
+                                    VIDEO
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- BODY -->
+                        <div class="gallery-card-body">
+
+                            <h2 class="gallery-card-name">
+                                {{ item.title }}
+                            </h2>
+
+
+                            {% if item.description %}
+
+                                <p class="gallery-description">
+                                    {{ item.description }}
+                                </p>
+
+                            {% else %}
+
+                                <p class="gallery-description">
+                                    Без опису
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- FOOTER -->
+                        <div class="gallery-footer">
+
+                            <span class="gallery-date">
+                                {{ item.created_at|date:"d.m.Y H:i" }}
+                            </span>
+
+
+                            <div class="gallery-actions">
+
+                                <a
+                                    href="{% url 'gallery:edit' item.pk %}"
+                                    class="gallery-action gallery-edit"
+                                    data-page-link
+                                >
+                                    Редагувати
+                                </a>
+
+
+                                <a
+                                    href="{% url 'gallery:delete' item.pk %}"
+                                    class="gallery-action gallery-delete"
+                                    data-page-link
+                                >
+                                    Видалити
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="gallery-empty">
+
+                <h2>
+                    Галерея порожня
+                </h2>
+
+                <p>
+                    Додай перше фото або відео.
+                </p>
+
+                <a
+                    href="{% url 'gallery:upload' %}"
+                    class="gallery-add-btn"
+                    data-page-link
+                >
+                    + Додати перший файл
+                </a>
+
+            </div>
+
+        {% endif %}
+
     </div>
 
-    <a href="{% url 'gallery:upload' %}" class="btn btn-primary">
-        Додати файл
-    </a>
 </div>
 
 
-<div class="row g-4">
+<script>
+    /* =========================================================
+       THEME
+       ========================================================= */
 
-    {% for item in media_items %}
+    const galleryPage =
+        document.getElementById("galleryPage");
 
-        <div class="col-12 col-sm-6 col-lg-4">
+    const darkThemeBtn =
+        document.getElementById("darkThemeBtn");
 
-            <div class="card h-100 shadow-sm">
+    const lightThemeBtn =
+        document.getElementById("lightThemeBtn");
 
-                {% if item.media_type == "image" %}
 
-                    <img
-                        src="{{ item.file.url }}"
-                        class="card-img-top"
-                        alt="{{ item.title }}"
-                        style="height: 250px; object-fit: cover;"
-                    >
+    function setGalleryTheme(theme) {
 
-                {% elif item.media_type == "video" %}
+        if (!galleryPage) return;
 
-                    <video
-                        class="card-img-top"
-                        controls
-                        preload="metadata"
-                        style="height: 250px; object-fit: cover;"
-                    >
-                        <source src="{{ item.file.url }}">
-                        Ваш браузер не підтримує відтворення відео.
-                    </video>
+        /*
+         * Маленька анімація при перемиканні.
+         */
+        galleryPage.style.opacity = "0.65";
+        galleryPage.style.transform = "scale(0.995)";
 
-                {% endif %}
 
-                <div class="card-body">
+        setTimeout(() => {
 
-                    <h5 class="card-title">
-                        {{ item.title }}
-                    </h5>
+            if (theme === "light") {
 
-                    {% if item.description %}
-                        <p class="card-text">
-                            {{ item.description }}
-                        </p>
-                    {% endif %}
+                galleryPage.classList.add("light-theme");
+                document.body.classList.add("gallery-light-theme");
 
-                </div>
+                lightThemeBtn.classList.add("active");
+                darkThemeBtn.classList.remove("active");
 
-                <div class="card-footer text-muted">
-                    {{ item.created_at|date:"d.m.Y H:i" }}
-                </div>
+            } else {
 
-            </div>
+                galleryPage.classList.remove("light-theme");
+                document.body.classList.remove("gallery-light-theme");
 
-        </div>
+                darkThemeBtn.classList.add("active");
+                lightThemeBtn.classList.remove("active");
 
-    {% empty %}
+            }
 
-        <div class="col-12">
-            <div class="alert alert-info">
-                Галерея поки що порожня.
-            </div>
-        </div>
+            localStorage.setItem(
+                "gallery-theme",
+                theme
+            );
 
-    {% endfor %}
 
-</div>
+            setTimeout(() => {
+
+                galleryPage.style.opacity = "1";
+                galleryPage.style.transform = "scale(1)";
+
+            }, 30);
+
+        }, 130);
+    }
+
+
+    darkThemeBtn.addEventListener(
+        "click",
+        function () {
+            setGalleryTheme("dark");
+        }
+    );
+
+
+    lightThemeBtn.addEventListener(
+        "click",
+        function () {
+            setGalleryTheme("light");
+        }
+    );
+
+
+    /*
+     * Завантажуємо збережену тему.
+     */
+    const savedTheme =
+        localStorage.getItem("gallery-theme");
+
+
+    if (savedTheme === "light") {
+
+        galleryPage.classList.add("light-theme");
+        document.body.classList.add("gallery-light-theme");
+
+        lightThemeBtn.classList.add("active");
+
+    } else {
+
+        document.body.classList.remove("gallery-light-theme");
+        darkThemeBtn.classList.add("active");
+
+    }
+
+
+    /* =========================================================
+       PAGE TRANSITIONS
+       ========================================================= */
+
+    document
+        .querySelectorAll("[data-page-link]")
+        .forEach(link => {
+
+            link.addEventListener(
+                "click",
+                function (event) {
+
+                    /*
+                     * Ctrl / middle click не блокуємо.
+                     */
+                    if (
+                        event.ctrlKey ||
+                        event.metaKey ||
+                        event.shiftKey ||
+                        event.button !== 0
+                    ) {
+                        return;
+                    }
+
+
+                    event.preventDefault();
+
+                    const href = this.href;
+
+
+                    galleryPage.classList.add("leaving");
+
+
+                    setTimeout(() => {
+
+                        window.location.href = href;
+
+                    }, 250);
+
+                }
+            );
+
+        });
+</script>
 
 {% endblock %}

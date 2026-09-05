@@ -1,5 +1,7 @@
-from django.db import models
+from pathlib import Path
+
 from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class MediaItem(models.Model):
@@ -23,9 +25,11 @@ class MediaItem(models.Model):
         verbose_name="Файл"
     )
 
+    # Тип визначається автоматично.
     media_type = models.CharField(
         max_length=10,
         choices=MEDIA_TYPES,
+        editable=False,
         verbose_name="Тип"
     )
 
@@ -42,11 +46,14 @@ class MediaItem(models.Model):
     def __str__(self):
         return self.title
 
-    def clean(self):
+    def determine_media_type(self):
+        """
+        Визначає тип файлу за його розширенням.
+        """
         if not self.file:
-            return
+            return None
 
-        extension = self.file.name.lower().split(".")[-1]
+        extension = Path(self.file.name).suffix.lower().lstrip(".")
 
         image_extensions = {
             "jpg",
@@ -54,6 +61,8 @@ class MediaItem(models.Model):
             "png",
             "gif",
             "webp",
+            "bmp",
+            "svg",
         }
 
         video_extensions = {
@@ -61,14 +70,61 @@ class MediaItem(models.Model):
             "webm",
             "ogg",
             "mov",
+            "avi",
+            "mkv",
+            "m4v",
+            "wmv",
         }
 
-        if self.media_type == "image" and extension not in image_extensions:
-            raise ValidationError(
-                "Для типу «Фото» потрібно завантажити зображення."
-            )
+        if extension in image_extensions:
+            return "image"
 
-        if self.media_type == "video" and extension not in video_extensions:
-            raise ValidationError(
-                "Для типу «Відео» потрібно завантажити відеофайл."
-            )
+        if extension in video_extensions:
+            return "video"
+
+        return None
+
+    def clean(self):
+        super().clean()
+
+        if not self.file:
+            raise ValidationError({
+                "file": "Вибери файл."
+            })
+
+        media_type = self.determine_media_type()
+
+        if media_type is None:
+            raise ValidationError({
+                "file": (
+                    "Непідтримуваний тип файлу. "
+                    "Дозволені фото: JPG, JPEG, PNG, GIF, WEBP, BMP, SVG. "
+                    "Відео: MP4, WEBM, OGG, MOV, AVI, MKV, M4V, WMV."
+                )
+            })
+
+    def save(self, *args, **kwargs):
+        """
+        Перед кожним збереженням автоматично визначає тип.
+        """
+        if self.file:
+            detected_type = self.determine_media_type()
+
+            if detected_type:
+                self.media_type = detected_type
+
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        """
+        Видаляє запис з БД і сам файл з диска.
+        """
+        file = self.file
+
+        result = super().delete(*args, **kwargs)
+
+        if file:
+            file.delete(save=False)
+
+        return result
