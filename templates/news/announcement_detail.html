@@ -1,0 +1,89 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ announcement.title }} | Шкільний портал</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<header>
+    <div class="container">
+
+        <h1>Шкільний портал</h1>
+
+        <nav>
+            <a href="{% url 'announcement_list' %}">Оголошення</a>
+            <a href="/admin/">Адмін-панель</a>
+        </nav>
+
+    </div>
+</header>
+
+
+<main class="container">
+
+    <div class="back-link">
+        <a href="{% url 'announcement_list' %}">
+            ← Назад до оголошень
+        </a>
+    </div>
+
+
+    <article class="detail-card">
+
+        {% if announcement.image %}
+            <img
+                class="detail-image"
+                src="{{ announcement.image.url }}"
+                alt="{{ announcement.title }}"
+            >
+        {% endif %}
+
+
+        <div class="detail-content">
+
+            {% if announcement.is_important %}
+                <span class="important-label">
+                    ВАЖЛИВО
+                </span>
+            {% endif %}
+
+
+            <h2>{{ announcement.title }}</h2>
+
+
+            <div class="detail-date">
+                📅 {{ announcement.created_at|date:"d.m.Y H:i" }}
+            </div>
+
+
+            <div class="detail-text">
+                {{ announcement.text|linebreaks }}
+            </div>
+
+
+            <a class="back-button"
+               href="{% url 'announcement_list' %}">
+                ← До всіх оголошень
+            </a>
+
+        </div>
+
+    </article>
+
+</main>
+
+
+<footer>
+    <p>Шкільний портал</p>
+</footer>
+
+</body>
+</html>
