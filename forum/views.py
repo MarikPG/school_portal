@@ -1,21 +1,28 @@
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from .models import Thread, Post
 
-# Create your views here.
-
 def forum_home(request):
-    threads = Thread.objects.all()
+    threads = Thread.objects.select_related('user').order_by('-updated_at')
     return render(request, 'forum/forum_home.html', {'threads': threads})
 
+
+def signup(request):
+    form = UserCreationForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('login')
+    return render(request, 'registration/signup.html', {'form': form})
+
 def thread_list(request):
-    threads = Thread.objects.all()
+    threads = Thread.objects.select_related('user').order_by('-updated_at')
     return render(request, 'forum/thread_list.html', {'threads': threads})
 
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, id=thread_id)
-    posts = thread.posts.all().order_by('created_at')
+    posts = thread.posts.select_related('user').prefetch_related('likes', 'dislikes').order_by('created_at')
     error = None
 
     if request.method == 'POST':
@@ -32,7 +39,7 @@ def thread_detail(request, thread_id):
                 user=request.user,
                 content=content
             )
-            return redirect('thread_detail', thread_id=thread.id)
+            return redirect('forum:thread_detail', thread_id=thread.id)
 
     return render(request, 'forum/thread_detail.html', {
         'thread': thread,
@@ -59,7 +66,7 @@ def create_thread(request):
                 content=content,
                 user=request.user
             )
-            return redirect('thread_list')
+            return redirect('forum:thread_list')
 
     return render(request, 'forum/create_thread.html', {'error': error})
 
@@ -82,7 +89,7 @@ def edit_thread(request, thread_id):
             thread.title = title
             thread.content = content
             thread.save()
-            return redirect('thread_detail', thread_id=thread.id)
+            return redirect('forum:thread_detail', thread_id=thread.id)
 
     return render(request, 'forum/edit_thread.html', {'thread': thread, 'error': error})
 
@@ -95,6 +102,24 @@ def delete_thread(request, thread_id):
 
     if request.method == 'POST':
         thread.delete()
-        return redirect('thread_list')
+        return redirect('forum:thread_list')
 
     return render(request, 'forum/delete_thread.html', {'thread': thread})
+
+
+@login_required
+def react_to_post(request, post_id, reaction):
+    if request.method != 'POST' or reaction not in {'like', 'dislike'}:
+        return redirect('forum:index')
+
+    post = get_object_or_404(Post, id=post_id)
+    own_reaction = post.likes if reaction == 'like' else post.dislikes
+    opposite_reaction = post.dislikes if reaction == 'like' else post.likes
+
+    if own_reaction.filter(id=request.user.id).exists():
+        own_reaction.remove(request.user)
+    else:
+        own_reaction.add(request.user)
+        opposite_reaction.remove(request.user)
+
+    return redirect('forum:thread_detail', thread_id=post.thread_id)

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Форум{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div><h1>Форум</h1><p class="text-muted mb-0">Обговорення шкільної спільноти</p></div>
+    <a class="btn btn-primary" href="{% url 'forum:thread_list' %}">Усі теми</a>
+</div>
+{% include 'forum/thread_items.html' %}
+{% endblock %}
