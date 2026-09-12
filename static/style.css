@@ -1,0 +1,14 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    background-color: #ffffff;
+}
+
+.errorlist {
+    color: #dc3545;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.25rem;
+}
