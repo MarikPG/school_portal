@@ -1,0 +1,82 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Оголошення | Шкільний портал</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<header>
+    <div class="container">
+        <h1>Шкільний портал</h1>
+        <nav>
+            <a href="/announcements/">Оголошення</a>
+            <a href="/admin/">Адмін-панель</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <h2>Оголошення</h2>
+        <p>Останні новини та важлива інформація для учнів.</p>
+    </section>
+
+    <div class="announcements">
+
+        {% for announcement in announcements %}
+
+            <div class="card {% if announcement.is_important %}important{% endif %}">
+
+                {% if announcement.image %}
+                    <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}">
+                {% endif %}
+
+                <div class="card-content">
+
+                    {% if announcement.is_important %}
+                        <span class="important-label">ВАЖЛИВО</span>
+                    {% endif %}
+
+                    <h3>{{ announcement.title }}</h3>
+
+                    <p class="date">
+                        {{ announcement.created_at|date:"d.m.Y H:i" }}
+                    </p>
+
+                    <p>
+                        {{ announcement.text|truncatewords:25 }}
+                    </p>
+
+                    <a class="button"
+                       href="{% url 'announcement_detail' announcement.id %}">
+                        Детальніше
+                    </a>
+
+                </div>
+            </div>
+
+        {% empty %}
+
+            <div class="empty">
+                <h3>Поки що немає оголошень</h3>
+                <p>Нові оголошення з'являться тут.</p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</main>
+
+<footer>
+    <p>Шкільний портал</p>
+</footer>
+
+</body>
+</html>
