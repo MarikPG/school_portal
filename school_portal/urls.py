@@ -4,6 +4,8 @@ from django.urls import include, path
 
 from school_portal import settings
 
+def home(request):
+    return render(request, "home.html")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
