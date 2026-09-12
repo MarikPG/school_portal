@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('survey/', include('surveyapp.urls')),
     path('admin/', admin.site.urls),
     path('announcements/', include('news.urls')),
 ]
