@@ -1,0 +1,620 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if is_edit %}
+        Редагування файлу
+    {% else %}
+        Додати файл
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    html, body {
+        margin: 0;
+        min-height: 100%;
+    }
+
+    body {
+        background: #0a0d12 !important;
+        transition: background .35s ease;
+    }
+
+    body.gallery-light-theme {
+        background: #f4f6fa !important;
+    }
+
+    .upload-page {
+        width: 100vw;
+        max-width: none;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+
+        --u-bg: #0a0d12;
+        --u-card: rgba(18,23,31,.94);
+        --u-text: #f3f5f8;
+        --u-muted: #8e97a7;
+        --u-border: rgba(255,255,255,.08);
+        --u-input: #0d1117;
+        --u-primary: #6d7cff;
+
+        min-height: 100vh;
+        padding: 40px 20px 60px;
+
+        color: var(--u-text);
+
+        background:
+            radial-gradient(
+                circle at 10% 0%,
+                rgba(109,124,255,.10),
+                transparent 30%
+            ),
+            var(--u-bg);
+
+        animation: uploadPageIn .35s ease;
+
+        transition:
+            background .3s ease,
+            color .3s ease;
+    }
+
+    .upload-page.light-theme {
+        --u-bg: #f4f6fa;
+        --u-card: rgba(255,255,255,.95);
+        --u-text: #171b24;
+        --u-muted: #6e7787;
+        --u-border: rgba(20,25,35,.10);
+        --u-input: #ffffff;
+        --u-primary: #5969e9;
+
+        background:
+            radial-gradient(
+                circle at 10% 0%,
+                rgba(89,105,233,.10),
+                transparent 30%
+            ),
+            var(--u-bg);
+    }
+
+    @keyframes uploadPageIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+
+    .upload-container {
+        width: min(720px, 100%);
+        margin: 0 auto;
+    }
+
+
+    .upload-card {
+        padding: 30px;
+
+        background: var(--u-card);
+
+        border: 1px solid var(--u-border);
+        border-radius: 19px;
+
+        box-shadow:
+            0 20px 55px rgba(0,0,0,.25);
+
+        transition:
+            background .3s ease,
+            border-color .3s ease,
+            box-shadow .3s ease;
+    }
+
+
+    .upload-title {
+        margin: 0;
+
+        font-size: 30px;
+        font-weight: 800;
+
+        letter-spacing: -.5px;
+    }
+
+
+    .upload-subtitle {
+        margin: 8px 0 30px;
+
+        color: var(--u-muted);
+
+        font-size: 14px;
+    }
+
+
+    .upload-group {
+        margin-bottom: 20px;
+    }
+
+
+    .upload-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: var(--u-text);
+
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+
+    .upload-input,
+    .upload-textarea,
+    .upload-file {
+        width: 100%;
+        box-sizing: border-box;
+
+        color: var(--u-text);
+        background: var(--u-input);
+
+        border: 1px solid var(--u-border);
+        border-radius: 11px;
+
+        outline: none;
+
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease,
+            background .3s ease;
+    }
+
+
+    .upload-input {
+        height: 46px;
+        padding: 0 14px;
+    }
+
+
+    .upload-textarea {
+        min-height: 130px;
+
+        padding: 13px 14px;
+
+        resize: vertical;
+    }
+
+
+    .upload-file {
+        padding: 11px;
+    }
+
+
+    .upload-input:focus,
+    .upload-textarea:focus,
+    .upload-file:focus {
+        border-color: rgba(109,124,255,.65);
+
+        box-shadow:
+            0 0 0 3px rgba(109,124,255,.10);
+    }
+
+
+    .upload-current {
+        margin-top: 9px;
+        padding: 10px 12px;
+
+        color: var(--u-muted);
+
+        border: 1px solid var(--u-border);
+        border-radius: 9px;
+
+        font-size: 12px;
+    }
+
+
+    .upload-help {
+        margin-top: 8px;
+
+        color: var(--u-muted);
+
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+
+    .upload-error {
+        margin-top: 7px;
+
+        color: #ff8d98;
+
+        font-size: 12px;
+    }
+
+
+    .upload-buttons {
+        display: flex;
+        gap: 10px;
+
+        margin-top: 28px;
+    }
+
+
+    .upload-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        min-height: 44px;
+        padding: 0 17px;
+
+        border-radius: 10px;
+
+        font-size: 13px;
+        font-weight: 700;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        transition:
+            transform .17s ease,
+            filter .17s ease,
+            background .17s ease,
+            border-color .17s ease;
+    }
+
+
+    .upload-btn:active {
+        transform: scale(.96);
+    }
+
+
+    .upload-submit {
+        border: 0;
+
+        color: white;
+
+        background:
+            linear-gradient(
+                135deg,
+                #6d7cff,
+                #805cff
+            );
+
+        box-shadow:
+            0 9px 23px rgba(109,124,255,.20);
+    }
+
+
+    .upload-submit:hover {
+        color: white;
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+
+        box-shadow:
+            0 14px 28px rgba(109,124,255,.28);
+    }
+
+
+    .upload-cancel {
+        color: var(--u-text);
+
+        background: rgba(127,127,127,.08);
+
+        border: 1px solid var(--u-border);
+    }
+
+
+    .upload-cancel:hover {
+        color: var(--u-text);
+
+        background: rgba(127,127,127,.15);
+
+        transform: translateY(-2px);
+    }
+
+
+    @media (max-width: 600px) {
+
+        .upload-page {
+            padding: 25px 13px 45px;
+        }
+
+        .upload-card {
+            padding: 22px;
+        }
+
+        .upload-buttons {
+            flex-direction: column;
+        }
+
+        .upload-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="upload-page">
+
+    <div class="upload-container">
+
+        <div class="upload-card">
+
+            {% if is_edit %}
+
+                <h1 class="upload-title">
+                    Редагування файлу
+                </h1>
+
+                <p class="upload-subtitle">
+                    Зміни назву, опис або заміни сам файл.
+                </p>
+
+            {% else %}
+
+                <h1 class="upload-title">
+                    Додати файл
+                </h1>
+
+                <p class="upload-subtitle">
+                    Вибери фото або відео. Тип визначиться автоматично.
+                </p>
+
+            {% endif %}
+
+
+            <form
+                method="post"
+                enctype="multipart/form-data"
+                id="uploadForm"
+            >
+
+                {% csrf_token %}
+
+
+                {% if form.non_field_errors %}
+
+                    <div class="upload-error">
+                        {{ form.non_field_errors }}
+                    </div>
+
+                {% endif %}
+
+
+                <!-- TITLE -->
+                <div class="upload-group">
+
+                    <label class="upload-label">
+                        Назва
+                    </label>
+
+                    <input
+                        type="text"
+                        name="title"
+                        value="{{ form.title.value|default:'' }}"
+                        class="upload-input"
+                        maxlength="200"
+                        placeholder="Назва файлу"
+                        required
+                    >
+
+                    {% if form.title.errors %}
+
+                        <div class="upload-error">
+                            {{ form.title.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+                <div class="upload-group">
+
+                    <label class="upload-label">
+                        Опис
+                    </label>
+
+                    <textarea
+                        name="description"
+                        class="upload-textarea"
+                        placeholder="Напиши опис..."
+                    >{{ form.description.value|default:'' }}</textarea>
+
+                    {% if form.description.errors %}
+
+                        <div class="upload-error">
+                            {{ form.description.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- FILE -->
+                <div class="upload-group">
+
+                    <label class="upload-label">
+                        Файл
+                    </label>
+
+                    <input
+                        type="file"
+                        name="file"
+                        class="upload-file"
+                        accept=".jpg,.jpeg,.png,.gif,.webp,.bmp,.svg,.mp4,.webm,.ogg,.mov,.avi,.mkv,.m4v,.wmv"
+                        {% if not is_edit %}required{% endif %}
+                    >
+
+
+                    {% if is_edit and item.file %}
+
+                        <div class="upload-current">
+
+                            Поточний файл:
+
+                            <strong>
+                                {{ item.file.name }}
+                            </strong>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="upload-help">
+
+                        Тип визначається автоматично.
+                        Фото та відео підтримуються.
+
+                    </div>
+
+
+                    {% if form.file.errors %}
+
+                        <div class="upload-error">
+                            {{ form.file.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- BUTTONS -->
+                <div class="upload-buttons">
+
+                    <button
+                        type="submit"
+                        class="upload-btn upload-submit"
+                        id="submitBtn"
+                    >
+                        {% if is_edit %}
+                            Зберегти зміни
+                        {% else %}
+                            Додати в галерею
+                        {% endif %}
+                    </button>
+
+
+                    <a
+                        href="{% url 'gallery:gallery' %}"
+                        class="upload-btn upload-cancel"
+                        data-back-link
+                    >
+                        Скасувати
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    /* =========================================================
+       GLOBAL GALLERY THEME
+       Синхронізовано з темою, вибраною на /gallery.
+       ========================================================= */
+
+    (function () {
+        const savedTheme = localStorage.getItem("gallery-theme");
+        const page = document.querySelector(".upload-page ");
+
+        if (savedTheme === "light") {
+            document.body.classList.add("gallery-light-theme");
+            if (page) page.classList.add("light-theme");
+        } else {
+            document.body.classList.remove("gallery-light-theme");
+            if (page) page.classList.remove("light-theme");
+        }
+    })();
+
+    /* =========================================================
+       CANCEL TRANSITION
+       ========================================================= */
+
+    const uploadPage =
+        document.querySelector(".upload-page");
+
+
+    document
+        .querySelectorAll("[data-back-link]")
+        .forEach(link => {
+
+            link.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.ctrlKey ||
+                        event.metaKey ||
+                        event.shiftKey ||
+                        event.button !== 0
+                    ) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const href = this.href;
+
+                    uploadPage.style.opacity = "0";
+                    uploadPage.style.transform =
+                        "translateY(10px)";
+
+
+                    setTimeout(() => {
+
+                        window.location.href = href;
+
+                    }, 220);
+
+                }
+            );
+
+        });
+
+
+    /* =========================================================
+       SUBMIT ANIMATION
+       ========================================================= */
+
+    const uploadForm =
+        document.getElementById("uploadForm");
+
+    const submitBtn =
+        document.getElementById("submitBtn");
+
+
+    if (uploadForm && submitBtn) {
+
+        uploadForm.addEventListener(
+            "submit",
+            function () {
+
+                submitBtn.style.pointerEvents = "none";
+
+                submitBtn.style.transform =
+                    "scale(.97)";
+
+                submitBtn.innerHTML =
+                    "Збереження...";
+
+            }
+        );
+
+    }
+</script>
+
+{% endblock %}
