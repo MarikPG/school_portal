@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Створити опитування{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 mt-4 mb-5">
+            <div class="mb-4">
+                <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">Конструктор</span>
+                <h1 class="fw-bold">Створити опитування</h1>
+                <p class="text-secondary mb-0">Заповніть назву та додайте питання. Варіанти вводьте кожен з нового рядка.</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                {% if survey_form.non_field_errors %}<div class="alert alert-danger">{{ survey_form.non_field_errors }}</div>{% endif %}
+                <div class="mb-3">
+                    {{ survey_form.title.label_tag }}
+                    {{ survey_form.title }}
+                    {{ survey_form.title.errors }}
+                </div>
+                <div class="mb-3">
+                    {{ survey_form.description.label_tag }}
+                    {{ survey_form.description }}
+                    {{ survey_form.description.errors }}
+                </div>
+                <div class="form-check mb-4">
+                    {{ survey_form.is_active }}
+                    {{ survey_form.is_active.label_tag }}
+                </div>
+
+                {{ question_formset.management_form }}
+                {% if question_formset.non_form_errors %}<div class="alert alert-danger">{{ question_formset.non_form_errors }}</div>{% endif %}
+                <h2 class="h4 mb-3">Питання</h2>
+                <div id="question-forms">
+                {% for form in question_formset %}
+                    <div class="question-form border rounded-3 p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="h6 text-secondary mb-0">Питання {{ forloop.counter }}</h3>
+                            <button class="btn btn-sm btn-outline-danger remove-question" type="button">Видалити питання</button>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.text.label_tag }}
+                            {{ form.text }}
+                            {{ form.text.errors }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.question_type.label_tag }}
+                            {{ form.question_type }}
+                        </div>
+                        <div class="mb-3 choice-editor">
+                            {{ form.choices.label_tag }}
+                            <div class="choice-inputs"></div>
+                            {{ form.choices.as_hidden }}
+                            <button class="btn btn-sm btn-outline-secondary add-choice" type="button">+ Додати варіант відповіді</button>
+                            <div class="form-text">Додайте всі можливі варіанти відповіді.</div>
+                        </div>
+                        <div class="form-check">
+                            {{ form.required }}
+                            {{ form.required.label_tag }}
+                        </div>
+                        {{ form.DELETE.as_hidden }}
+                    </div>
+                {% endfor %}
+                </div>
+                <button class="btn btn-outline-primary mb-4" type="button" id="add-question">+ Додати питання</button>
+                <button class="btn btn-primary btn-lg mt-3" type="submit">Створити опитування</button>
+            </form>
+        </div>
+    </div>
+</div>
+<template id="empty-question-form">
+    <div class="question-form border rounded-3 p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h6 text-secondary mb-0">Питання __prefix__</h3>
+            <button class="btn btn-sm btn-outline-danger remove-question" type="button">Видалити питання</button>
+        </div>
+        <div class="mb-3">
+            {{ question_formset.empty_form.text.label_tag }}
+            {{ question_formset.empty_form.text }}
+        </div>
+        <div class="mb-3">
+            {{ question_formset.empty_form.question_type.label_tag }}
+            {{ question_formset.empty_form.question_type }}
+        </div>
+        <div class="mb-3 choice-editor">
+            {{ question_formset.empty_form.choices.label_tag }}
+            <div class="choice-inputs"></div>
+            {{ question_formset.empty_form.choices.as_hidden }}
+            <button class="btn btn-sm btn-outline-secondary add-choice" type="button">+ Додати варіант відповіді</button>
+            <div class="form-text">Для текстової відповіді варіанти не потрібні.</div>
+        </div>
+        <div class="form-check">
+            {{ question_formset.empty_form.required }}
+            {{ question_formset.empty_form.required.label_tag }}
+        </div>
+        {{ question_formset.empty_form.DELETE.as_hidden }}
+    </div>
+</template>
+<script>
+    const addQuestionButton = document.getElementById('add-question');
+    const questionForms = document.getElementById('question-forms');
+    const totalForms = document.getElementById('id_questions-TOTAL_FORMS');
+    const emptyQuestionForm = document.getElementById('empty-question-form').innerHTML;
+
+    function syncChoices(questionForm) {
+        const values = Array.from(questionForm.querySelectorAll('.choice-value'))
+            .map((input) => input.value.trim())
+            .filter(Boolean);
+        questionForm.querySelector('[name$="-choices"]').value = values.join('\n');
+    }
+
+    function setupQuestionForm(questionForm) {
+        const typeSelect = questionForm.querySelector('select[name$="-question_type"]');
+        const editor = questionForm.querySelector('.choice-editor');
+        const inputs = questionForm.querySelector('.choice-inputs');
+        const hiddenChoices = questionForm.querySelector('[name$="-choices"]');
+        const existingChoices = hiddenChoices.value.split('\n').filter(Boolean);
+
+        existingChoices.forEach((value) => addChoiceInput(inputs, value));
+        if (!existingChoices.length && typeSelect.value !== 'text') addChoiceInput(inputs, '');
+
+        function updateEditor() {
+            editor.classList.toggle('d-none', typeSelect.value === 'text');
+        }
+
+        typeSelect.addEventListener('change', updateEditor);
+        questionForm.querySelector('.add-choice').addEventListener('click', () => addChoiceInput(inputs, ''));
+        questionForm.querySelector('.remove-question').addEventListener('click', () => {
+            questionForm.querySelector('[name$="-DELETE"]').value = 'on';
+            questionForm.classList.add('d-none');
+            renumberQuestions();
+        });
+        updateEditor();
+    }
+
+    function addChoiceInput(container, value) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'input-group mb-2';
+        wrapper.innerHTML = '<input type="text" class="form-control choice-value" placeholder="Варіант відповіді"><button type="button" class="btn btn-outline-danger remove-choice">Видалити</button>';
+        const input = wrapper.querySelector('.choice-value');
+        input.value = value;
+        input.addEventListener('input', () => syncChoices(container.closest('.question-form')));
+        wrapper.querySelector('.remove-choice').addEventListener('click', () => {
+            wrapper.remove();
+            syncChoices(container.closest('.question-form'));
+        });
+        container.appendChild(wrapper);
+    }
+
+    function renumberQuestions() {
+        let visibleNumber = 1;
+        document.querySelectorAll('#question-forms .question-form').forEach((questionForm) => {
+            if (!questionForm.classList.contains('d-none')) {
+                questionForm.querySelector('h3').textContent = `Питання ${visibleNumber}`;
+                visibleNumber += 1;
+            }
+        });
+    }
+
+    document.querySelectorAll('.question-form').forEach(setupQuestionForm);
+    renumberQuestions();
+
+    addQuestionButton.addEventListener('click', () => {
+        const formIndex = Number(totalForms.value);
+        questionForms.insertAdjacentHTML('beforeend', emptyQuestionForm.replaceAll('__prefix__', formIndex));
+        setupQuestionForm(questionForms.lastElementChild);
+        totalForms.value = formIndex + 1;
+        renumberQuestions();
+    });
+
+    document.querySelector('form').addEventListener('submit', () => {
+        document.querySelectorAll('.question-form').forEach(syncChoices);
+    });
+</script>
+{% endblock %}
