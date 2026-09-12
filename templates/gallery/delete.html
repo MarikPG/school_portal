@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block title %}Видалення файлу{% endblock %}
+
+{% block content %}
+
+<style>
+    html, body {
+        margin: 0;
+        min-height: 100%;
+    }
+
+    body {
+        background: #0a0d12 !important;
+        transition: background .35s ease;
+    }
+
+    body.gallery-light-theme {
+        background: #f4f6fa !important;
+    }
+
+    .delete-page {
+        width: 100vw;
+        max-width: none;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+
+        --d-bg: #0a0d12;
+        --d-card: rgba(18,23,31,.95);
+        --d-text: #f3f5f8;
+        --d-muted: #8e97a7;
+        --d-border: rgba(255,255,255,.08);
+        --d-danger: #ef5968;
+
+        min-height: 100vh;
+
+        padding: 70px 20px;
+
+        color: var(--d-text);
+
+        background:
+            radial-gradient(
+                circle at center top,
+                rgba(239,89,104,.07),
+                transparent 30%
+            ),
+            var(--d-bg);
+
+        animation:
+            deletePageIn .3s ease;
+    }
+
+
+    .delete-page.light-theme {
+        --d-bg: #f4f6fa;
+        --d-card: rgba(255,255,255,.95);
+        --d-text: #171b24;
+        --d-muted: #6e7787;
+        --d-border: rgba(20,25,35,.10);
+
+        background:
+            radial-gradient(
+                circle at center top,
+                rgba(239,89,104,.06),
+                transparent 30%
+            ),
+            var(--d-bg);
+    }
+
+    @keyframes deletePageIn {
+
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    }
+
+
+    .delete-container {
+        width: min(510px, 100%);
+
+        margin: 50px auto 0;
+    }
+
+
+    .delete-card {
+        padding: 32px;
+
+        text-align: center;
+
+        background: var(--d-card);
+
+        border: 1px solid var(--d-border);
+        border-radius: 19px;
+
+        box-shadow:
+            0 25px 60px rgba(0,0,0,.30);
+    }
+
+
+    .delete-icon {
+        width: 62px;
+        height: 62px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin: 0 auto 20px;
+
+        border-radius: 17px;
+
+        color: #ff9da7;
+
+        background:
+            rgba(239,89,104,.10);
+
+        border:
+            1px solid rgba(239,89,104,.16);
+
+        font-size: 26px;
+        font-weight: 800;
+
+        animation:
+            deleteIconIn .4s ease;
+    }
+
+
+    @keyframes deleteIconIn {
+
+        0% {
+            opacity: 0;
+            transform: scale(.75);
+        }
+
+        70% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+    }
+
+
+    .delete-title {
+        margin: 0;
+
+        color: var(--d-text);
+
+        font-size: 27px;
+        font-weight: 800;
+    }
+
+
+    .delete-text {
+        margin: 10px 0 0;
+
+        color: var(--d-muted);
+
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+
+    .delete-name {
+        margin: 22px 0;
+
+        padding: 13px;
+
+        color: var(--d-text);
+
+        background:
+            rgba(255,255,255,.025);
+
+        border: 1px solid var(--d-border);
+        border-radius: 10px;
+
+        font-size: 14px;
+        font-weight: 750;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .delete-buttons {
+        display: flex;
+
+        justify-content: center;
+
+        gap: 10px;
+
+        margin-top: 25px;
+    }
+
+
+    .delete-btn {
+        min-height: 44px;
+
+        padding: 0 18px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        font-size: 13px;
+        font-weight: 700;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        transition:
+            transform .17s ease,
+            background .17s ease,
+            filter .17s ease;
+    }
+
+
+    .delete-btn:active {
+        transform: scale(.95);
+    }
+
+
+    .delete-confirm {
+        border: 0;
+
+        color: white;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ef5968,
+                #d94358
+            );
+
+        box-shadow:
+            0 9px 22px rgba(239,89,104,.18);
+    }
+
+
+    .delete-confirm:hover {
+        color: white;
+
+        transform: translateY(-2px);
+
+        filter: brightness(1.06);
+
+        box-shadow:
+            0 13px 28px rgba(239,89,104,.25);
+    }
+
+
+    .delete-cancel {
+        color: var(--d-text);
+
+        background:
+            rgba(127,127,127,.08);
+
+        border:
+            1px solid var(--d-border);
+    }
+
+
+    .delete-cancel:hover {
+        color: var(--d-text);
+
+        background:
+            rgba(127,127,127,.15);
+
+        transform: translateY(-2px);
+    }
+
+
+    @media (max-width: 550px) {
+
+        .delete-page {
+            padding: 40px 13px;
+        }
+
+        .delete-container {
+            margin-top: 20px;
+        }
+
+        .delete-card {
+            padding: 25px 20px;
+        }
+
+        .delete-buttons {
+            flex-direction: column;
+        }
+
+        .delete-btn {
+            width: 100%;
+        }
+
+    }
+</style>
+
+
+<div class="delete-page">
+
+    <div class="delete-container">
+
+        <div class="delete-card">
+
+            <div class="delete-icon">
+                !
+            </div>
+
+
+            <h1 class="delete-title">
+                Видалити файл?
+            </h1>
+
+
+            <p class="delete-text">
+                Ти справді хочеш видалити цей файл?
+                Цю дію неможливо скасувати.
+            </p>
+
+
+            <div class="delete-name">
+                {{ item.title }}
+            </div>
+
+
+            <form
+                method="post"
+                id="deleteForm"
+            >
+
+                {% csrf_token %}
+
+
+                <div class="delete-buttons">
+
+                    <button
+                        type="submit"
+                        class="delete-btn delete-confirm"
+                        id="deleteBtn"
+                    >
+                        Видалити
+                    </button>
+
+
+                    <a
+                        href="{% url 'gallery:gallery' %}"
+                        class="delete-btn delete-cancel"
+                        data-back-link
+                    >
+                        Скасувати
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    /* =========================================================
+       GLOBAL GALLERY THEME
+       Синхронізовано з темою, вибраною на /gallery.
+       ========================================================= */
+
+    (function () {
+        const savedTheme = localStorage.getItem("gallery-theme");
+        const page = document.querySelector(".delete-page ");
+
+        if (savedTheme === "light") {
+            document.body.classList.add("gallery-light-theme");
+            if (page) page.classList.add("light-theme");
+        } else {
+            document.body.classList.remove("gallery-light-theme");
+            if (page) page.classList.remove("light-theme");
+        }
+    })();
+
+    /* =========================================================
+       BACK TRANSITION
+       ========================================================= */
+
+    const deletePage =
+        document.querySelector(".delete-page");
+
+
+    document
+        .querySelectorAll("[data-back-link]")
+        .forEach(link => {
+
+            link.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.ctrlKey ||
+                        event.metaKey ||
+                        event.shiftKey ||
+                        event.button !== 0
+                    ) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const href = this.href;
+
+                    deletePage.style.opacity = "0";
+                    deletePage.style.transform =
+                        "translateY(10px)";
+
+
+                    setTimeout(() => {
+
+                        window.location.href = href;
+
+                    }, 220);
+
+                }
+            );
+
+        });
+
+
+    /* =========================================================
+       DELETE BUTTON
+       ========================================================= */
+
+    const deleteForm =
+        document.getElementById("deleteForm");
+
+    const deleteBtn =
+        document.getElementById("deleteBtn");
+
+
+    if (deleteForm && deleteBtn) {
+
+        deleteForm.addEventListener(
+            "submit",
+            function () {
+
+                deleteBtn.disabled = true;
+
+                deleteBtn.style.pointerEvents =
+                    "none";
+
+                deleteBtn.style.opacity = ".7";
+
+                deleteBtn.innerHTML =
+                    "Видалення...";
+
+            }
+        );
+
+    }
+</script>
+
+{% endblock %}
